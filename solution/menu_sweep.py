@@ -1,5 +1,10 @@
 """
-Menu Sweep Prompt - Final Solution
+Menu Sweep Prompt
+
+Usage:
+    python solution/menu_sweep.py "<input_file>.html"
+    e.g. python solution/menu_sweep.py "data/input/menu_sweep/test/9_accordion_rocketspark_no.html"
+
 """
 
 SWEEP_DECISION_SYSTEM_PROMPT = """
