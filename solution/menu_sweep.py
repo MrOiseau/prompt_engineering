@@ -3,7 +3,7 @@ Menu Sweep Prompt
 
 Usage:
     python solution/menu_sweep.py "<input_file>.html"
-    e.g. python solution/menu_sweep.py "data/input/menu_sweep/test/9_accordion_rocketspark_no.html"
+    e.g. python solution/menu_sweep.py "solution/test_examples/input/menu_sweep_example_accordion_bootstrap.html"
 
 """
 
@@ -77,6 +77,7 @@ Field mapping:
 
 import sys
 import os
+import time
 try:
     from openai import OpenAI
 except ImportError:
@@ -130,6 +131,27 @@ if __name__ == "__main__":
         result = response.choices[0].message.content
         print("\n--- Result ---\n")
         print(result)
+
+        # 5. Save Output
+        base_name = os.path.splitext(os.path.basename(input_file))[0]
+        # User requested: same name - extension + timestamp + .json (since it is JSON output)
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        
+        # Determine output directory
+        input_dir = os.path.dirname(os.path.abspath(input_file))
+        if "input" in input_dir:
+            output_dir = input_dir.replace("input", "output")
+        else:
+            output_dir = os.path.join(input_dir, "output")
+            
+        os.makedirs(output_dir, exist_ok=True)
+        
+        output_file = os.path.join(output_dir, f"{base_name}_{timestamp}.json")
+        
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(result)
+            
+        print(f"\nSaved output to {output_file}")
         
     except Exception as e:
         print(f"\nError calling OpenAI API: {e}")

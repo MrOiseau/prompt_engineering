@@ -3,7 +3,7 @@ PII Redactor Script (Standalone)
 
 Usage:
     python solution/redacting_pii.py <input_file>.txt
-    e.g. python solution/redacting_pii.py "data/input/pii_redaction/06_long_interview_shorter.txt"
+    e.g. python solution/redacting_pii.py "solution/test_examples/input/pii_redaction_example_long_intervew.txt"
 """
 import asyncio
 import json
@@ -426,18 +426,29 @@ if __name__ == "__main__":
         
         # Output paths
         base_name = os.path.splitext(os.path.basename(input_file))[0]
+        extension = os.path.splitext(os.path.basename(input_file))[1]
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        output_dir = os.path.dirname(input_file) # fallback if output dir not specified
+        output_dir = os.path.dirname(os.path.abspath(input_file)) # fallback
         
         # Try to use a specific output folder if "input" in path -> "output"
         if "input" in os.path.dirname(os.path.abspath(input_file)):
             output_dir = os.path.dirname(os.path.abspath(input_file)).replace("input", "output")
-            os.makedirs(output_dir, exist_ok=True)
+        else:
+            output_dir = os.path.join(output_dir, "output")
+            
+        os.makedirs(output_dir, exist_ok=True)
 
-        json_output_path = os.path.join(output_dir, f"{base_name}_{timestamp}.json")
-        vault_output_path = os.path.join(output_dir, f"{base_name}_{timestamp}.vault.json")
+        # 1. Redacted Text Output (Original Extension)
+        # User requested: same name - extension + timestamp + .<<same_extension>>
+        redacted_output_path = os.path.join(output_dir, f"{base_name}_{timestamp}{extension}")
         
-        # 1. Main JSON Output (Redacted Text + Metadata)
+        with open(redacted_output_path, "w", encoding="utf-8") as f:
+            f.write(result.redacted_text)
+        print(f"Saved redacted text to {redacted_output_path}")
+
+        # 2. Main JSON Output (Redacted Text + Metadata)
+        json_output_path = os.path.join(output_dir, f"{base_name}_{timestamp}.json")
+        
         # Convert entities to list of dicts
         entities_data = [e.model_dump() for e in result.entities]
         
@@ -453,7 +464,8 @@ if __name__ == "__main__":
             json.dump(output_data, f, indent=2)
         print(f"Saved JSON output to {json_output_path}")
 
-        # 2. Vault Output (ID -> Original Mapping)
+        # 3. Vault Output (ID -> Original Mapping)
+        vault_output_path = os.path.join(output_dir, f"{base_name}_{timestamp}.vault.json")
         with open(vault_output_path, "w", encoding="utf-8") as f:
             json.dump(result.vault, f, indent=2)
         print(f"Saved Vault output to {vault_output_path}")
