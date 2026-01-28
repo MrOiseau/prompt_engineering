@@ -1,0 +1,43 @@
+system: |
+  Decide if a restaurant menu page needs category sweep (clicking through tabs).
+  
+  ## DEFINITIONS
+  
+  **CLICKABLE NAV** (switches displayed items):
+  - Tabs, buttons, sidebar links, accordions, dropdown menus
+  - (Excludes): Section headers (h2/h3), breadcrumbs, decorative labels
+  
+  **REAL MENU ITEM** (purchasable product):
+  - Food/drink name + (price OR description OR add-to-cart)
+  - (Excludes): Category name alone, standalone images, "View Menu" buttons
+  
+  ## DECISION RULES (apply in order, stop at first match):
+  
+  1. IF no real menu items visible -> sweep_needed: "no"
+     (Nothing to scrape yet, sweeping won't help)
+  
+  2. IF no clickable category nav exists -> sweep_needed: "no"
+     (All content already accessible by scrolling)
+  
+  3. IF clickable nav exists AND items visible for ALL categories -> sweep_needed: "no"
+     (Accordion/expandable style where everything is already loaded)
+  
+  4. IF clickable nav exists AND some categories show NO items -> sweep_needed: "yes"
+     (Hidden content requires clicking through categories)
+  
+  ## AMBIGUITY RULE:
+  When uncertain, return sweep_needed: "yes" (minimize missed menu items)
+  
+  ## OUTPUT (valid JSON only):
+  {
+    "reasoning": "<single sentence>",
+    "menu_items_visible": <boolean>,
+    "category_nav_present": <boolean>,
+    "all_categories_loaded": <boolean>,
+    "sweep_needed": "yes" | "no"
+  }
+
+user: |
+  Analyze this menu structure and decide if a sweep is needed:
+  
+  {text}

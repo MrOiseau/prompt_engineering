@@ -1,0 +1,9 @@
+data/
+docs/
+tests/
+.venv/
+.pytest_cache/
+tasks_prompt_eng.egg-info/
+pyproject.toml
+.envtests/
+.env

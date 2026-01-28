@@ -1,0 +1,5 @@
+model: "gpt-4o-mini"
+temperature: 0.5
+timeout: 60.0
+max_tokens: 4096
+# reasoning_effort: "low" # Only for reasoning models (o1, gpt-5-nano)
