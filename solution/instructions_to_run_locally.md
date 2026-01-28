@@ -2,7 +2,18 @@
 
 Follow these steps to set up the environment and run the solution scripts.
 
-## 1. Install Python 3.13
+## 1. Clone the Repository
+
+Open your terminal and clone the repository:
+
+```bash
+git clone https://github.com/MrOiseau/prompt_engineering.git
+cd prompt_engineering
+```
+
+---
+
+## 2. Install Python 3.13
 
 ### macOS
 **Recommended (using Homebrew):**
@@ -27,7 +38,7 @@ sudo apt install python3.13 python3.13-venv
 
 ---
 
-## 2. Setup Project Environment
+## 3. Setup Project Environment
 
 Open your terminal (Terminal, PowerShell, or Git Bash) and navigate to the project root directory.
 
@@ -65,7 +76,7 @@ source .venv/bin/activate
 
 ---
 
-## 3. Install Dependencies
+## 4. Install Dependencies
 
 With the virtual environment activated, install the required packages:
 
@@ -75,7 +86,7 @@ pip install -r requirements.txt
 
 ---
 
-## 4. Setup Environment Variables
+## 5. Setup Environment Variables
 
 You need an OpenAI API key to run the scripts.
 
@@ -86,18 +97,18 @@ You need an OpenAI API key to run the scripts.
 
 ---
 
-## 5. Run the Solutions
+## 6. Run the Solutions
 
 ### Menu Sweep
 This script analyzes an HTML file to decide if a category sweep is needed.
 
 ```bash
-python solution/menu_sweep.py "data/input/menu_sweep/test/9_accordion_rocketspark_no.html"
+python solution/menu_sweep.py "solution/test_examples/input/menu_sweep_example_accordion_bootstrap.html"
 ```
 
 ### PII Redaction
 This script redacts PII from a text file and saves the output as `*.json` (redacted text + metadata) and `*.vault.json` (ID mapping).
 
 ```bash
-python solution/redacting_pii.py "data/input/pii_redaction/06_long_interview_shorter.txt"
+python solution/redacting_pii.py "solution/test_examples/input/pii_redaction_example_long_intervew.txt"
 ```
