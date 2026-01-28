@@ -7,3 +7,7 @@ tasks_prompt_eng.egg-info/
 pyproject.toml
 .envtests/
 .env
+.DS_Store
+eval_output.txt
+eval_results.jsonl
+eval_summary.json
