@@ -2,7 +2,8 @@
 PII Redactor Script (Standalone)
 
 Usage:
-    python redacting_pii.py <input_file>
+    python solution/redacting_pii.py <input_file>.txt
+    e.g. python solution/redacting_pii.py "data/input/pii_redaction/06_long_interview_shorter.txt"
 """
 import asyncio
 import json
@@ -423,11 +424,38 @@ if __name__ == "__main__":
         print("-" * 40)
         print(f"Stats: {result.redaction_count} entities redacted. Model: {result.model}")
         
-        # Save output to file as well
-        out_file = input_file + ".redacted"
-        with open(out_file, "w", encoding="utf-8") as f:
-            f.write(result.redacted_text)
-        print(f"Saved redacted text to {out_file}")
+        # Output paths
+        base_name = os.path.splitext(os.path.basename(input_file))[0]
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        output_dir = os.path.dirname(input_file) # fallback if output dir not specified
+        
+        # Try to use a specific output folder if "input" in path -> "output"
+        if "input" in os.path.dirname(os.path.abspath(input_file)):
+            output_dir = os.path.dirname(os.path.abspath(input_file)).replace("input", "output")
+            os.makedirs(output_dir, exist_ok=True)
+
+        json_output_path = os.path.join(output_dir, f"{base_name}_{timestamp}.json")
+        vault_output_path = os.path.join(output_dir, f"{base_name}_{timestamp}.vault.json")
+        
+        # 1. Main JSON Output (Redacted Text + Metadata)
+        output_data = {
+            "original_file": input_file,
+            "redacted_text": result.redacted_text,
+            "stats": {
+                "redaction_count": result.redaction_count,
+                "model": result.model,
+                "tokens_used": result.tokens_used
+            }
+        }
+        with open(json_output_path, "w", encoding="utf-8") as f:
+            json.dump(output_data, f, indent=2)
+        print(f"Saved JSON output to {json_output_path}")
+
+        # 2. Vault Output (ID -> Original Mapping)
+        with open(vault_output_path, "w", encoding="utf-8") as f:
+            json.dump(result.vault, f, indent=2)
+        print(f"Saved Vault output to {vault_output_path}")
+        
     except Exception as e:
         print(f"Error executing redaction: {e}")
         sys.exit(1)
