@@ -70,5 +70,62 @@ Field mapping:
 - sweep_needed: per decision rules above.
 """
 
+import sys
+import os
+try:
+    from openai import OpenAI
+except ImportError:
+    print("Error: 'openai' package is required. Install it using 'pip install openai'")
+    sys.exit(1)
+
 if __name__ == "__main__":
-    print(SWEEP_DECISION_SYSTEM_PROMPT)
+    # 1. Parse Arguments
+    if len(sys.argv) < 2:
+        print("Usage: python menu_sweep.py <input_html_file>")
+        sys.exit(1)
+    
+    input_file = sys.argv[1]
+    if not os.path.exists(input_file):
+        print(f"Error: File '{input_file}' not found.")
+        sys.exit(1)
+
+    # 2. Get API Key
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("OPENAI_API_KEY environment variable not found.")
+        api_key = input("Please enter your OpenAI API Key: ").strip()
+    
+    if not api_key:
+        print("Error: API Key is required to run the model.")
+        sys.exit(1)
+
+    # 3. Read Input
+    try:
+        with open(input_file, "r", encoding="utf-8") as f:
+            html_content = f.read()
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        sys.exit(1)
+
+    # 4. Call LLM
+    print(f"Analyzing {input_file} with gpt-4o...")
+    client = OpenAI(api_key=api_key)
+    
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": SWEEP_DECISION_SYSTEM_PROMPT},
+                {"role": "user", "content": html_content}
+            ],
+            temperature=0.0,
+            response_format={"type": "json_object"}
+        )
+        
+        result = response.choices[0].message.content
+        print("\n--- Result ---\n")
+        print(result)
+        
+    except Exception as e:
+        print(f"\nError calling OpenAI API: {e}")
+        sys.exit(1)
