@@ -398,21 +398,36 @@ if __name__ == "__main__":
     if not os.path.exists(input_file):
         print(f"File not found: {input_file}")
         sys.exit(1)
+
+    # Setup API Key
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("OPENAI_API_KEY environment variable not found.")
+        api_key = input("Please enter your OpenAI API Key: ").strip()
+        if api_key:
+            os.environ["OPENAI_API_KEY"] = api_key
+        else:
+            print("Error: API Key is required.")
+            sys.exit(1)
         
     with open(input_file, "r", encoding="utf-8") as f:
         text = f.read()
         
     redactor = PIIRedactor()
-    result = redactor.run(text)
-    
-    print("REDACTED TEXT:")
-    print("-" * 40)
-    print(result.redacted_text)
-    print("-" * 40)
-    print(f"Stats: {result.redaction_count} entities redacted. Model: {result.model}")
-    
-    # Save output to file as well
-    out_file = input_file + ".redacted"
-    with open(out_file, "w", encoding="utf-8") as f:
-        f.write(result.redacted_text)
-    print(f"Saved redacted text to {out_file}")
+    try:
+        result = redactor.run(text)
+        
+        print("REDACTED TEXT:")
+        print("-" * 40)
+        print(result.redacted_text)
+        print("-" * 40)
+        print(f"Stats: {result.redaction_count} entities redacted. Model: {result.model}")
+        
+        # Save output to file as well
+        out_file = input_file + ".redacted"
+        with open(out_file, "w", encoding="utf-8") as f:
+            f.write(result.redacted_text)
+        print(f"Saved redacted text to {out_file}")
+    except Exception as e:
+        print(f"Error executing redaction: {e}")
+        sys.exit(1)
