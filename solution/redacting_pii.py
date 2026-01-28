@@ -438,14 +438,16 @@ if __name__ == "__main__":
         vault_output_path = os.path.join(output_dir, f"{base_name}_{timestamp}.vault.json")
         
         # 1. Main JSON Output (Redacted Text + Metadata)
+        # Convert entities to list of dicts
+        entities_data = [e.model_dump() for e in result.entities]
+        
         output_data = {
             "original_file": input_file,
             "redacted_text": result.redacted_text,
-            "stats": {
-                "redaction_count": result.redaction_count,
-                "model": result.model,
-                "tokens_used": result.tokens_used
-            }
+            "entities": entities_data,
+            "redaction_count": result.redaction_count,
+            "model": result.model,
+            "tokens_used": result.tokens_used
         }
         with open(json_output_path, "w", encoding="utf-8") as f:
             json.dump(output_data, f, indent=2)
